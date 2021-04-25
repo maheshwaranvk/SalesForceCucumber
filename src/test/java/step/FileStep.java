@@ -1,5 +1,7 @@
 package step;
 
+import java.awt.AWTException;
+
 import org.openqa.selenium.Keys;
 
 import base.WrapperClass2;
@@ -22,13 +24,14 @@ public class FileStep extends WrapperClass2{
 
 	@Given("Click on the latest modified item link")
 	public void click_on_the_latest_modified_item_link() throws InterruptedException {
-	   elementClick("xpath", "//span[@title='Last Modified Date']/parent::a");
+		if(locateElement("xpath", "//span[@title='Last Modified Date']/parent::a/following::span[text()='Sorted Descending']").isDisplayed()==false) {
+	   elementClick("xpath", "//span[@title='Last Modified Date']/parent::a");}
 	   Thread.sleep(2000);
 	}
 
 	@Given("Click on Public link")
 	public void click_on_public_link() throws InterruptedException {
-	   elementClick("xpath", "(//a[@class='rowActionsPlaceHolder slds-button slds-button--icon-x-small slds-button--icon-border-filled keyboardMode--trigger'])[1]");
+	   elementClick("xpath", "(//table[@role='grid']//td[4]//a)[1]");
 	   elementClick("xpath", "//div[@title='Public Link']//parent::a");
 	   waitForIt("xpath", "//h2[text()='Public Link Sharing']");
 	}
@@ -46,14 +49,15 @@ public class FileStep extends WrapperClass2{
 
 	@Given("Download the file into a specified folder inside the project")
 	public void download_the_file_into_a_specified_folder_inside_the_project() throws InterruptedException {
-		elementClick("xpath", "(//a[@class='rowActionsPlaceHolder slds-button slds-button--icon-x-small slds-button--icon-border-filled keyboardMode--trigger'])[1]");
+		
+		elementClick("xpath", "(//table[@role='grid']//td[4]//a)[1]");
 		elementClick("xpath", "//div[@title='Download']/parent::a");
 		Thread.sleep(3000);
 	}
 
 	@Given("Click on Share")
 	public void click_on_share() {
-		elementClick("xpath", "(//a[@class='rowActionsPlaceHolder slds-button slds-button--icon-x-small slds-button--icon-border-filled keyboardMode--trigger'])[1]");
+		elementClick("xpath", "(//table[@role='grid']//td[4]//a)[1]");
 		elementClick("xpath", "//div[@title='Share']/parent::a");
 		waitForIt("xpath", "//h2[@class='title slds-text-heading--medium slds-hyphenate']");
 	}
@@ -73,38 +77,53 @@ public class FileStep extends WrapperClass2{
 	}
 
 	@Given("Click on Upload Files and browse a file from your local")
-	public void click_on_upload_files_and_browse_a_file_from_your_local() {
+	public void click_on_upload_files_and_browse_a_file_from_your_local() throws AWTException, InterruptedException {
 	   javaScriptClick(locateElement("xpath", "//div[@title='Upload Files']"));
+	   uploadFile("C:\\Users\\Mahesh\\Desktop\\Joey Food.pdf");
+	   waitForIt("xpath", "//span[text()='1 of 1 file uploaded']");
+	   elementClick("xpath", "//span[text()='Done']");
+	   Thread.sleep(2000);
 	}
 
 	@Given("Click on DrowDown for the newly uploaded file and select View File Details")
 	public void click_on_drow_down_for_the_newly_uploaded_file_and_select_view_file_details() {
-	   
+		
+		elementClick("xpath", "(//table[@role='grid']//td[4]//a)[1]");
+		elementClick("xpath", "//div[@title='View File Details']/parent::a");
+		waitForIt("xpath", "(//div[@class='entityNameTitle slds-line-height_reset' and text()='File'])");
+		
 	}
 
 	@Then("Verify the file name and extension of the newly uploaded file")
 	public void verify_the_file_name_and_extension_of_the_newly_uploaded_file() {
-	   
+	   getAs().assertTrue(locateElement("xpath", "//div[@title='Joey Food']").isDisplayed());
+	   getAs().assertTrue(locateElement("xpath", "//span[@data-aura-class='uiOutputText' and text()='pdf']").isDisplayed());
+	   getAs().assertAll();
 	}
 
 	@Then("Close the file window tab")
-	public void close_the_file_window_tab() {
-	    
+	public void close_the_file_window_tab() throws InterruptedException {
+	    elementClick("xpath", "//div[@class='close slds-col--bump-left slds-p-left--none slds-context-bar__icon-action ']//button[@title='Close Joey Food']");
+	    Thread.sleep(2000);
+	    elementClick("xpath", "//a[@title='Files']");
 	}
 
 	@Then("Click on DropDown for the newly uploaded file and select Delete")
 	public void click_on_drop_down_for_the_newly_uploaded_file_and_select_delete() {
-	   
+		elementClick("xpath", "(//table[@role='grid']//td[4]//a)[1]");
+		elementClick("xpath", "//li//a[@title='Delete']");
+		waitForIt("xpath", "//h2[text()='Delete File?']");
 	}
 
 	@Then("Confirm Delete")
 	public void confirm_delete() {
-	  
+	  elementClick("xpath", "//span[text()='Delete']");
 	}
 
 	@Then("Verify the success message displayed for the delete")
 	public void verify_the_success_message_displayed_for_the_delete() {
-	   
+	   getAs().assertTrue(locateElement("xpath", "//div[@title='Undo']").isDisplayed());
+	   getAs().assertAll();
 	}
 	
 }

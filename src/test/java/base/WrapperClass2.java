@@ -6,12 +6,15 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -24,6 +27,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -43,6 +47,8 @@ public class WrapperClass2 extends AbstractTestNGCucumberTests{
 	public WebDriverWait wait;
 	public SoftAssert as;
 	public String excelFileName;
+	public File folder;
+	public static ChromeOptions options;
 	
 	public static String createDate,modifiedDate,ownerName;
 	
@@ -89,8 +95,20 @@ public class WrapperClass2 extends AbstractTestNGCucumberTests{
 		if (browser.equalsIgnoreCase("chrome")) {
 			WebDriverManager.chromedriver().setup();
 
-			ChromeOptions options = new ChromeOptions();
+			options = new ChromeOptions();
+			
 			options.addArguments("--disable-notifications");
+			folder =  new File("target");
+			folder.mkdir();
+			
+			Map<String, Object> prefs = new HashMap<String, Object>();
+			prefs.put("profile.default_content_settings.popups",0);
+			prefs.put("download.default_directory",folder.getAbsolutePath());
+			
+			options.setExperimentalOption("prefs", prefs);
+			DesiredCapabilities cap = new DesiredCapabilities();
+			cap.setCapability(ChromeOptions.CAPABILITY, options);
+			
 			driver = new ChromeDriver(options);
 			setDriver(driver);
 		}
@@ -265,4 +283,22 @@ public void uploadFile(String filePath) throws AWTException, InterruptedExceptio
 	public void sendText(String loc, String val,String strValue) {
 		locateElement(loc, val).sendKeys(strValue);
 	}
+
+	//--------------------------SET DOWNLOAD FOLDER--------------------------------------------------------------------------------------------------------
+	
+	/*
+	 * public void setDownloadFolder() { folder = new File("target");
+	 * folder.mkdir();
+	 * 
+	 * Map<String, Object> prefs = new HashMap<String, Object>();
+	 * prefs.put("profile.default_content_settings.popups",0);
+	 * prefs.put("download.default_directory",folder.getAbsolutePath());
+	 * 
+	 * options.setExperimentalOption("prefs", prefs); DesiredCapabilities cap = new
+	 * DesiredCapabilities(); cap.setCapability(ChromeOptions.CAPABILITY, options);
+	 * 
+	 * driver = new ChromeDriver(options);
+	 * 
+	 * }
+	 */
 }
